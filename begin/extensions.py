@@ -4,6 +4,7 @@ import logging
 import logging.handlers
 import platform
 import sys
+import colorlog
 
 from begin.wrappable import Wrapping
 from begin.utils import tobool
@@ -98,13 +99,13 @@ class Logging(Extension):
         elif opts.quiet:
             level = logging.WARNING
         # logger
-        logger = logging.getLogger()
+        logger = colorlog.getLogger()
         for handler in logger.handlers:
             logger.removeHandler(handler)
         logger.setLevel(level)
         # handler
         if opts.logfile is None:
-            handler = logging.StreamHandler(sys.stdout)
+            handler = colorlog.StreamHandler(sys.stdout)
         elif platform.system() != 'Windows':
             handler = logging.handlers.WatchedFileHandler(opts.logfile)
         else:
@@ -112,12 +113,12 @@ class Logging(Extension):
         logger.addHandler(handler)
         # formatter
         fmt = opts.logfmt
-        if fmt is None:
-            if opts.logfile is None:
-                fmt = '%(message)s'
-            else:
-                fmt = '[%(asctime)s] [%(levelname)s] [%(pathname)s:%(lineno)s] %(message)s'
-        formatter = logging.Formatter(fmt)
+        if fmt is None and opts.logfile is not None:
+            fmt = '[%(asctime)s] [%(levelname)s] [%(pathname)s:%(lineno)s] %(message)s'
+        if opts.logfile is None:
+            formatter = colorlog.ColoredFormatter()  # Cannot use a regular format string with ColoredFormatter
+        else:
+            formatter = logging.Formatter(fmt)
         handler.setFormatter(formatter)
 
 
