@@ -19,6 +19,7 @@ PYTHON3K = sys.version_info[0] > 2
 
 requires = ['funcsigs'] if sys.version_info[:2] < (3, 3) else []
 requires += ['argparse'] if sys.version_info[:2] < (2, 7) else []
+requires += ['colorlog']
 
 setup(
     name="begins",
